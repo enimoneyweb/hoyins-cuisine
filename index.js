@@ -171,8 +171,7 @@ document.getElementById("cartItems");
 const cartCount =
 document.getElementById("cartCount");
 
-const cartTotal =
-document.getElementById("cartTotal");
+cartTotal.textContent = `₦${total.toLocaleString()}`;
 
 const checkoutBtn =
 document.getElementById("checkoutBtn");
