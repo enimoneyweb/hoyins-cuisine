@@ -1,521 +1,611 @@
 /* =========================================
-HOYIN'S CUISINE
-JAVASCRIPT
+   HOYIN'S CUISINE
+   JAVASCRIPT
 ========================================= */
 
+
 /* =========================================
-MOBILE MENU
+   MOBILE MENU
 ========================================= */
 
 const menuBtn = document.getElementById("menuBtn");
 const navbar = document.getElementById("navbar");
 
 if (menuBtn && navbar) {
-menuBtn.addEventListener("click", () => {
+  menuBtn.addEventListener("click", () => {
+    navbar.classList.toggle("open");
 
-navbar.classList.toggle("open");
+    const icon = menuBtn.querySelector("i");
 
-const icon = menuBtn.querySelector("i");
-
-if (icon) {
-  if (navbar.classList.contains("open")) {
-    icon.classList.remove("fa-bars");
-    icon.classList.add("fa-xmark");
-  } else {
-    icon.classList.remove("fa-xmark");
-    icon.classList.add("fa-bars");
-  }
+    if (icon) {
+      if (navbar.classList.contains("open")) {
+        icon.classList.remove("fa-bars");
+        icon.classList.add("fa-xmark");
+      } else {
+        icon.classList.remove("fa-xmark");
+        icon.classList.add("fa-bars");
+      }
+    }
+  });
 }
 
-});
-}
-
-/* Close mobile menu */
-
-document.querySelectorAll(".navbar a").forEach(link => {
-
-link.addEventListener("click", () => {
-
-if (navbar) {
-  navbar.classList.remove("open");
-}
-
-const icon = menuBtn?.querySelector("i");
-
-if (icon) {
-  icon.classList.remove("fa-xmark");
-  icon.classList.add("fa-bars");
-}
-
-});
-
-});
 
 /* =========================================
-ACTIVE NAVIGATION
+   CLOSE MOBILE MENU
+========================================= */
+
+document.querySelectorAll(".navbar a").forEach(link => {
+  link.addEventListener("click", () => {
+
+    if (navbar) {
+      navbar.classList.remove("open");
+    }
+
+    const icon = menuBtn?.querySelector("i");
+
+    if (icon) {
+      icon.classList.remove("fa-xmark");
+      icon.classList.add("fa-bars");
+    }
+
+  });
+});
+
+
+/* =========================================
+   ACTIVE NAVIGATION
 ========================================= */
 
 const sections = document.querySelectorAll("section[id]");
+
 const navLinks =
-document.querySelectorAll(".navbar > a:not(.nav-order)");
+  document.querySelectorAll(".navbar > a:not(.nav-order)");
 
 window.addEventListener("scroll", () => {
 
-let current = "";
+  let current = "";
 
-sections.forEach(section => {
+  sections.forEach(section => {
 
-const sectionTop = section.offsetTop - 150;
+    const sectionTop =
+      section.offsetTop - 150;
 
-if (window.scrollY >= sectionTop) {
-  current = section.getAttribute("id");
-}
+    if (window.scrollY >= sectionTop) {
+      current = section.getAttribute("id");
+    }
+
+  });
+
+  navLinks.forEach(link => {
+
+    link.classList.remove("active");
+
+    if (
+      link.getAttribute("href") ===
+      `#${current}`
+    ) {
+      link.classList.add("active");
+    }
+
+  });
 
 });
 
-navLinks.forEach(link => {
-
-link.classList.remove("active");
-
-if (link.getAttribute("href") === `#${current}`) {
-  link.classList.add("active");
-}
-
-});
-
-});
 
 /* =========================================
-MENU FILTER
+   MENU FILTER
 ========================================= */
 
 const categoryButtons =
-document.querySelectorAll(".category");
+  document.querySelectorAll(".category");
 
 const foodCards =
-document.querySelectorAll(".food-card");
+  document.querySelectorAll(".food-card");
 
 categoryButtons.forEach(button => {
 
-button.addEventListener("click", () => {
+  button.addEventListener("click", () => {
 
-categoryButtons.forEach(btn => {
-  btn.classList.remove("active");
+    categoryButtons.forEach(btn => {
+      btn.classList.remove("active");
+    });
+
+    button.classList.add("active");
+
+    const filter =
+      button.getAttribute("data-filter");
+
+    foodCards.forEach(card => {
+
+      const category =
+        card.getAttribute("data-category");
+
+      if (
+        filter === "all" ||
+        category === filter
+      ) {
+
+        card.style.display = "block";
+
+        setTimeout(() => {
+          card.style.opacity = "1";
+          card.style.transform =
+            "translateY(0)";
+        }, 30);
+
+      } else {
+
+        card.style.opacity = "0";
+        card.style.transform =
+          "translateY(10px)";
+
+        setTimeout(() => {
+          card.style.display = "none";
+        }, 200);
+
+      }
+
+    });
+
+  });
+
 });
 
-button.classList.add("active");
-
-const filter =
-  button.getAttribute("data-filter");
-
-
-foodCards.forEach(card => {
-
-  const category =
-    card.getAttribute("data-category");
-
-
-  if (filter === "all" || category === filter) {
-
-    card.style.display = "block";
-
-    setTimeout(() => {
-      card.style.opacity = "1";
-      card.style.transform = "translateY(0)";
-    }, 30);
-
-  } else {
-
-    card.style.opacity = "0";
-    card.style.transform = "translateY(10px)";
-
-    setTimeout(() => {
-      card.style.display = "none";
-    }, 200);
-
-  }
-
-});
-
-});
-
-});
 
 /* =========================================
-SHOPPING CART
+   SHOPPING CART
 ========================================= */
-
-/*
-IMPORTANT:
-"cartItemsData" stores the products.
-"cartPanel" refers to the actual cart sidebar.
-*/
 
 let cartItemsData = [];
 
 const cartBtn =
-document.getElementById("cartBtn");
+  document.getElementById("cartBtn");
 
 const cartPanel =
-document.getElementById("cart");
+  document.getElementById("cart");
 
 const cartOverlay =
-document.getElementById("cartOverlay");
+  document.getElementById("cartOverlay");
 
 const closeCart =
-document.getElementById("closeCart");
+  document.getElementById("closeCart");
 
 const cartItems =
-document.getElementById("cartItems");
+  document.getElementById("cartItems");
 
 const cartCount =
-document.getElementById("cartCount");
+  document.getElementById("cartCount");
 
-cartTotal.textContent = `₦${total.toLocaleString()}`;
+const cartTotal =
+  document.getElementById("cartTotal");
 
 const checkoutBtn =
-document.getElementById("checkoutBtn");
+  document.getElementById("checkoutBtn");
 
 const toast =
-document.getElementById("toast");
+  document.getElementById("toast");
+
 
 /* =========================================
-OPEN CART
+   OPEN CART
 ========================================= */
 
 if (cartBtn) {
 
-cartBtn.addEventListener("click", () => {
+  cartBtn.addEventListener("click", () => {
 
-cartPanel?.classList.add("open");
+    cartPanel?.classList.add("open");
 
-cartOverlay?.classList.add("show");
+    cartOverlay?.classList.add("show");
 
-document.body.classList.add("no-scroll");
+    document.body.classList.add("no-scroll");
 
-});
+  });
 
 }
 
+
 /* =========================================
-CLOSE CART
+   CLOSE CART
 ========================================= */
 
 function closeCartPanel() {
 
-cartPanel?.classList.remove("open");
+  cartPanel?.classList.remove("open");
 
-cartOverlay?.classList.remove("show");
+  cartOverlay?.classList.remove("show");
 
-document.body.classList.remove("no-scroll");
+  document.body.classList.remove("no-scroll");
 
 }
 
 closeCart?.addEventListener(
-"click",
-closeCartPanel
+  "click",
+  closeCartPanel
 );
 
 cartOverlay?.addEventListener(
-"click",
-closeCartPanel
+  "click",
+  closeCartPanel
 );
 
+
 /* =========================================
-ADD TO CART
+   ADD TO CART
 ========================================= */
 
-document.querySelectorAll(".quick-add").forEach(button => {
+document
+  .querySelectorAll(".quick-add")
+  .forEach(button => {
 
-button.addEventListener("click", () => {
+    button.addEventListener("click", () => {
 
-const name =
-  button.getAttribute("data-name");
+      const name =
+        button.getAttribute("data-name");
 
-const price =
-  Number(button.getAttribute("data-price"));
+      const price =
+        Number(
+          button.getAttribute("data-price")
+        );
 
+      if (!name || isNaN(price)) {
+        showToast("Unable to add this item");
+        return;
+      }
 
-const existing =
-  cartItemsData.find(
-    item => item.name === name
-  );
+      const existing =
+        cartItemsData.find(
+          item => item.name === name
+        );
 
+      if (existing) {
 
-if (existing) {
+        existing.quantity++;
 
-  existing.quantity++;
+      } else {
 
-} else {
+        cartItemsData.push({
+          name: name,
+          price: price,
+          quantity: 1
+        });
 
-  cartItemsData.push({
-    name: name,
-    price: price,
-    quantity: 1
+      }
+
+      updateCart();
+
+      showToast(
+        `${name} added to your order`
+      );
+
+    });
+
   });
 
-}
-
-
-updateCart();
-
-showToast(`${name} added to your order`);
-
-});
-
-});
 
 /* =========================================
-UPDATE CART
+   UPDATE CART
 ========================================= */
 
 function updateCart() {
 
-if (!cartItems) return;
+  if (!cartItems) return;
 
-cartItems.innerHTML = "";
+  cartItems.innerHTML = "";
 
-if (cartItemsData.length === 0) {
+  let total = 0;
 
-cartItems.innerHTML = `
-
-  <div class="empty-cart">
-
-    <i class="fa-solid fa-basket-shopping"></i>
-
-    <h3>Your cart is empty</h3>
-
-    <p>
-      Add something delicious from our menu.
-    </p>
-
-  </div>
-
-`;
-
-}
-
-let total = 0;
-let quantityTotal = 0;
-
-cartItemsData.forEach((item, index) => {
-
-total += item.price * item.quantity;
-
-quantityTotal += item.quantity;
+  let quantityTotal = 0;
 
 
-const itemElement =
-  document.createElement("div");
+  /* EMPTY CART */
 
-itemElement.className = "cart-item";
+  if (cartItemsData.length === 0) {
 
+    cartItems.innerHTML = `
 
-itemElement.innerHTML = `
+      <div class="empty-cart">
 
-  <div class="cart-item-info">
+        <i class="fa-solid fa-basket-shopping"></i>
 
-    <h4>${item.name}</h4>
+        <h3>Your cart is empty</h3>
 
-    <p>
-      ₦${item.price.toLocaleString()}
-      × ${item.quantity}
-    </p>
+        <p>
+          Add something delicious from our menu.
+        </p>
 
-  </div>
+      </div>
 
-  <button
-    class="remove-item"
-    data-index="${index}"
-    aria-label="Remove item"
-  >
-    <i class="fa-solid fa-trash"></i>
-  </button>
+    `;
 
-`;
+  }
 
 
-cartItems.appendChild(itemElement);
+  /* CART ITEMS */
 
-});
+  cartItemsData.forEach((item, index) => {
 
-if (cartCount) {
-cartCount.textContent = quantityTotal;
-}
+    const itemTotal =
+      item.price * item.quantity;
 
-if (cartTotal) {
-cartTotal.textContent =
-"₦${total.toLocaleString()}";
-}
+    total += itemTotal;
 
-document.querySelectorAll(".remove-item")
-.forEach(button => {
+    quantityTotal += item.quantity;
 
-  button.addEventListener("click", () => {
 
-    const index =
-      Number(
-        button.getAttribute("data-index")
-      );
+    const itemElement =
+      document.createElement("div");
 
-    cartItemsData.splice(index, 1);
+    itemElement.className =
+      "cart-item";
 
-    updateCart();
+
+    itemElement.innerHTML = `
+
+      <div class="cart-item-info">
+
+        <h4>${item.name}</h4>
+
+        <p>
+          ₦${item.price.toLocaleString()}
+          × ${item.quantity}
+        </p>
+
+      </div>
+
+      <button
+        class="remove-item"
+        data-index="${index}"
+        aria-label="Remove ${item.name}"
+      >
+        <i class="fa-solid fa-trash"></i>
+      </button>
+
+    `;
+
+
+    cartItems.appendChild(itemElement);
 
   });
 
-});
+
+  /* CART COUNT */
+
+  if (cartCount) {
+
+    cartCount.textContent =
+      quantityTotal;
+
+  }
+
+
+  /* CART TOTAL */
+
+  if (cartTotal) {
+
+    cartTotal.textContent =
+      `₦${total.toLocaleString()}`;
+
+  }
+
+
+  /* REMOVE ITEMS */
+
+  document
+    .querySelectorAll(".remove-item")
+    .forEach(button => {
+
+      button.addEventListener("click", () => {
+
+        const index =
+          Number(
+            button.getAttribute("data-index")
+          );
+
+        if (
+          !Number.isInteger(index) ||
+          index < 0 ||
+          index >= cartItemsData.length
+        ) {
+          return;
+        }
+
+        cartItemsData.splice(index, 1);
+
+        updateCart();
+
+        showToast("Item removed from your order");
+
+      });
+
+    });
 
 }
 
+
 /* =========================================
-TOAST
+   TOAST
 ========================================= */
 
 let toastTimer;
 
 function showToast(message) {
 
-if (!toast) return;
+  if (!toast) return;
 
-const toastText =
-toast.querySelector("span");
+  const toastText =
+    toast.querySelector("span");
 
-if (toastText) {
-toastText.textContent = message;
-}
+  if (toastText) {
+    toastText.textContent = message;
+  }
 
-toast.classList.add("show");
+  toast.classList.add("show");
 
-clearTimeout(toastTimer);
+  clearTimeout(toastTimer);
 
-toastTimer = setTimeout(() => {
+  toastTimer = setTimeout(() => {
 
-toast.classList.remove("show");
+    toast.classList.remove("show");
 
-}, 2500);
-
-}
-
-/* =========================================
-WHATSAPP ORDER
-========================================= */
-
-checkoutBtn?.addEventListener("click", () => {
-
-if (cartItemsData.length === 0) {
-
-showToast("Your cart is empty");
-
-return;
+  }, 2500);
 
 }
 
-let message =
-"Hello Hoyin's Cuisine! 👋\n\n" +
-"I would like to order:\n\n";
-
-let total = 0;
-
-cartItemsData.forEach(item => {
-
-const itemTotal =
-  item.price * item.quantity;
-
-total += itemTotal;
-
-
-message +=
-  `• ${item.name} × ${item.quantity} — ₦${itemTotal.toLocaleString()}\n`;
-
-});
-
-message +=
-"\nTotal: ₦${total.toLocaleString()}\n\n";
-
-message +=
-"Please let me know how I can complete my order.";
-
-const whatsappURL =
-"https://wa.me/2348142532364?text=${encodeURIComponent(message)}";
-
-window.open(
-whatsappURL,
-"_blank"
-);
-
-});
 
 /* =========================================
-IMAGE FALLBACK
+   WHATSAPP ORDER
 ========================================= */
 
-document.querySelectorAll("img").forEach(img => {
+if (checkoutBtn) {
 
-img.addEventListener("error", () => {
+  checkoutBtn.addEventListener(
+    "click",
+    () => {
 
-img.style.background = "#ddd";
-img.style.objectFit = "cover";
+      if (cartItemsData.length === 0) {
 
-});
+        showToast("Your cart is empty");
 
-});
-
-/* =========================================
-SCROLL REVEAL
-========================================= */
-
-const revealElements =
-document.querySelectorAll(
-".food-card, .review-card, .feature, " +
-".about-content, .about-images, .gallery-item"
-);
-
-if ("IntersectionObserver" in window) {
-
-const observer =
-new IntersectionObserver(
-entries => {
-
-    entries.forEach(entry => {
-
-      if (entry.isIntersecting) {
-
-        entry.target.style.opacity = "1";
-
-        entry.target.style.transform =
-          "translateY(0)";
-
-        observer.unobserve(entry.target);
+        return;
 
       }
 
-    });
 
-  },
-  {
-    threshold: 0.12
-  }
-);
+      let message =
+        "Hello Hoyin's Cuisine! 👋\n\n" +
+        "I would like to order:\n\n";
 
-revealElements.forEach(element => {
 
-element.style.opacity = "0";
+      let total = 0;
 
-element.style.transform =
-  "translateY(25px)";
 
-element.style.transition =
-  "opacity .7s ease, transform .7s ease";
+      cartItemsData.forEach(item => {
 
-observer.observe(element);
+        const itemTotal =
+          item.price * item.quantity;
 
-});
+        total += itemTotal;
+
+
+        message +=
+          `• ${item.name} × ${item.quantity} — ₦${itemTotal.toLocaleString()}\n`;
+
+      });
+
+
+      message +=
+        `\nTotal: ₦${total.toLocaleString()}\n\n`;
+
+
+      message +=
+        "Please let me know how I can complete my order.";
+
+
+      const whatsappURL =
+        `https://wa.me/2348142532364?text=${encodeURIComponent(message)}`;
+
+
+      window.open(
+        whatsappURL,
+        "_blank"
+      );
+
+    }
+  );
 
 }
 
+
 /* =========================================
-INITIAL CART
+   IMAGE FALLBACK
+========================================= */
+
+document
+  .querySelectorAll("img")
+  .forEach(img => {
+
+    img.addEventListener("error", () => {
+
+      img.style.background = "#ddd";
+
+      img.style.objectFit = "cover";
+
+    });
+
+  });
+
+
+/* =========================================
+   SCROLL REVEAL
+========================================= */
+
+const revealElements =
+  document.querySelectorAll(
+    ".food-card, .review-card, .feature, " +
+    ".about-content, .about-images, .gallery-item"
+  );
+
+
+if ("IntersectionObserver" in window) {
+
+  const observer =
+    new IntersectionObserver(
+      entries => {
+
+        entries.forEach(entry => {
+
+          if (entry.isIntersecting) {
+
+            entry.target.style.opacity =
+              "1";
+
+            entry.target.style.transform =
+              "translateY(0)";
+
+            observer.unobserve(
+              entry.target
+            );
+
+          }
+
+        });
+
+      },
+      {
+        threshold: 0.12
+      }
+    );
+
+
+  revealElements.forEach(element => {
+
+    element.style.opacity = "0";
+
+    element.style.transform =
+      "translateY(25px)";
+
+    element.style.transition =
+      "opacity .7s ease, transform .7s ease";
+
+    observer.observe(element);
+
+  });
+
+}
+
+
+/* =========================================
+   INITIAL CART
 ========================================= */
 
 updateCart();
+
+
+/* =========================================
+   HOYIN'S CUISINE JS LOADED
+========================================= */
+
+console.log(
+  "Hoyin's Cuisine JavaScript is working!"
+);
