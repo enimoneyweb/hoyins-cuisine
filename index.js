@@ -454,68 +454,413 @@ function showToast(message) {
 
 
 /* =========================================
-   WHATSAPP ORDER
+   CHECKOUT
 ========================================= */
 
 if (checkoutBtn) {
+  checkoutBtn.addEventListener("click", () => {
 
-  checkoutBtn.addEventListener(
+    if (cartItemsData.length === 0) {
+      showToast("Your cart is empty");
+      return;
+    }
+
+    openCheckout();
+
+  });
+}
+
+
+/* =========================================
+   OPEN CHECKOUT
+========================================= */
+
+function openCheckout() {
+
+  const total = cartItemsData.reduce(
+    (sum, item) =>
+      sum + (item.price * item.quantity),
+    0
+  );
+
+  const orderSummary = cartItemsData
+    .map(item => `
+      <div class="checkout-item">
+        <span>
+          ${item.name} × ${item.quantity}
+        </span>
+
+        <strong>
+          ₦${(item.price * item.quantity).toLocaleString()}
+        </strong>
+      </div>
+    `)
+    .join("");
+
+  const checkoutHTML = `
+
+    <div class="checkout-overlay" id="checkoutOverlay">
+
+      <div class="checkout-modal">
+
+        <button
+          class="checkout-close"
+          id="checkoutClose"
+          aria-label="Close checkout"
+        >
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <div class="checkout-header">
+
+          <span class="checkout-label">
+            HOYIN'S CUISINE
+          </span>
+
+          <h2>Complete Your Order</h2>
+
+          <p>
+            Tell us where to deliver your food.
+          </p>
+
+        </div>
+
+
+        <div class="checkout-summary">
+
+          <h3>Your Order</h3>
+
+          ${orderSummary}
+
+          <div class="checkout-total">
+            <span>Total</span>
+            <strong>
+              ₦${total.toLocaleString()}
+            </strong>
+          </div>
+
+        </div>
+
+
+        <form id="checkoutForm" class="checkout-form">
+
+          <div class="form-group">
+
+            <label for="customerName">
+              Full Name
+            </label>
+
+            <input
+              type="text"
+              id="customerName"
+              placeholder="Enter your name"
+              required
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="customerPhone">
+              Phone Number
+            </label>
+
+            <input
+              type="tel"
+              id="customerPhone"
+              placeholder="08012345678"
+              required
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="deliveryAddress">
+              Delivery Address
+            </label>
+
+            <textarea
+              id="deliveryAddress"
+              placeholder="Enter your delivery address"
+              rows="3"
+              required
+            ></textarea>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="orderNote">
+              Special Instructions
+              <span>(Optional)</span>
+            </label>
+
+            <textarea
+              id="orderNote"
+              placeholder="Anything we should know?"
+              rows="2"
+            ></textarea>
+
+          </div>
+
+
+          <button
+            type="submit"
+            class="place-order-btn"
+          >
+            <span>Place Order</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+
+        </form>
+
+      </div>
+
+    </div>
+
+  `;
+
+
+  document.body.insertAdjacentHTML(
+    "beforeend",
+    checkoutHTML
+  );
+
+
+  const checkoutOverlay =
+    document.getElementById("checkoutOverlay");
+
+  const checkoutClose =
+    document.getElementById("checkoutClose");
+
+  const checkoutForm =
+    document.getElementById("checkoutForm");
+
+
+  checkoutClose?.addEventListener(
     "click",
-    () => {
+    closeCheckout
+  );
 
-      if (cartItemsData.length === 0) {
 
-        showToast("Your cart is empty");
+  checkoutOverlay?.addEventListener(
+    "click",
+    event => {
 
-        return;
-
+      if (event.target === checkoutOverlay) {
+        closeCheckout();
       }
-
-
-      let message =
-        "Hello Hoyin's Cuisine! 👋\n\n" +
-        "I would like to order:\n\n";
-
-
-      let total = 0;
-
-
-      cartItemsData.forEach(item => {
-
-        const itemTotal =
-          item.price * item.quantity;
-
-        total += itemTotal;
-
-
-        message +=
-          `• ${item.name} × ${item.quantity} — ₦${itemTotal.toLocaleString()}\n`;
-
-      });
-
-
-      message +=
-        `\nTotal: ₦${total.toLocaleString()}\n\n`;
-
-
-      message +=
-        "Please let me know how I can complete my order.";
-
-
-      const whatsappURL =
-        `https://wa.me/2348142532364?text=${encodeURIComponent(message)}`;
-
-
-      window.open(
-        whatsappURL,
-        "_blank"
-      );
 
     }
   );
 
+
+  checkoutForm?.addEventListener(
+    "submit",
+    handleOrderSubmit
+  );
+
 }
 
+
+/* =========================================
+   CLOSE CHECKOUT
+========================================= */
+
+function closeCheckout() {
+
+  const checkoutOverlay =
+    document.getElementById("checkoutOverlay");
+
+  if (checkoutOverlay) {
+    checkoutOverlay.remove();
+  }
+
+}
+
+
+/* =========================================
+   PLACE ORDER
+========================================= */
+
+function handleOrderSubmit(event) {
+
+  event.preventDefault();
+
+
+  const name =
+    document
+      .getElementById("customerName")
+      ?.value.trim();
+
+
+  const phone =
+    document
+      .getElementById("customerPhone")
+      ?.value.trim();
+
+
+  const address =
+    document
+      .getElementById("deliveryAddress")
+      ?.value.trim();
+
+
+  const note =
+    document
+      .getElementById("orderNote")
+      ?.value.trim();
+
+
+  if (!name || !phone || !address) {
+
+    showToast(
+      "Please complete all required fields"
+    );
+
+    return;
+
+  }
+
+
+  const total =
+    cartItemsData.reduce(
+      (sum, item) =>
+        sum + (item.price * item.quantity),
+      0
+    );
+
+
+  closeCheckout();
+
+
+  /* Clear cart */
+
+  cartItemsData = [];
+
+  updateCart();
+
+
+  /* Close cart */
+
+  closeCartPanel();
+
+
+  /* Show success */
+
+  showOrderSuccess(
+    name,
+    total,
+    phone,
+    address,
+    note
+  );
+
+}
+
+
+/* =========================================
+   ORDER SUCCESS
+========================================= */
+
+function showOrderSuccess(
+  name,
+  total,
+  phone,
+  address,
+  note
+) {
+
+  const successHTML = `
+
+    <div
+      class="success-overlay"
+      id="successOverlay"
+    >
+
+      <div class="success-modal">
+
+        <div class="success-icon">
+
+          <i class="fa-solid fa-check"></i>
+
+        </div>
+
+        <span class="success-label">
+          ORDER RECEIVED
+        </span>
+
+        <h2>
+          Thank You, ${name}!
+        </h2>
+
+        <p>
+          Your order has been received successfully.
+          Our team will contact you on
+          ${phone} to confirm your order.
+        </p>
+
+
+        <div class="success-details">
+
+          <div>
+            <span>Total</span>
+
+            <strong>
+              ₦${total.toLocaleString()}
+            </strong>
+          </div>
+
+
+          <div>
+            <span>Delivery</span>
+
+            <strong>
+              ${address}
+            </strong>
+          </div>
+
+        </div>
+
+
+        <button
+          class="success-btn"
+          id="successClose"
+        >
+          Back to Menu
+        </button>
+
+      </div>
+
+    </div>
+
+  `;
+
+
+  document.body.insertAdjacentHTML(
+    "beforeend",
+    successHTML
+  );
+
+
+  document
+    .getElementById("successClose")
+    ?.addEventListener(
+      "click",
+      () => {
+
+        document
+          .getElementById("successOverlay")
+          ?.remove();
+
+      }
+    );
+
+}
 
 /* =========================================
    IMAGE FALLBACK
